@@ -3,12 +3,13 @@ from typing import Callable, TextIO
 
 import sol_snake
 from utils import get_example_file, get_exercise_file
+import argparse
 
 type Solution = Callable[[TextIO, bool], typing.Any]
 
 SOLUTION_PREFIX = "day_"
-RUN_EXAMPLES : bool = False
-SKIP_EXERCISE : bool = False
+RUN_EXAMPLES : bool
+RUN_EXERCISE : bool
 DAYS = range(1, 25 + 1)
 SKIP_DAYS : list[int] = []
 STOP_BEFORE = 2
@@ -23,6 +24,17 @@ def print_content_separator():
     print("-"*30)
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog="AdventOfCode - 2024"
+    )
+
+    parser.add_argument("-m", "--exercises", help="Run the exercises", action='store_true')
+    parser.add_argument("-e", "--examples", help="Run the examples", action='store_true')
+
+    args = parser.parse_args()
+    RUN_EXAMPLES = args.examples
+    RUN_EXERCISE = args.exercises
+
     solution_prefix = "day_"
     for day in DAYS:
         if day in SKIP_DAYS:
@@ -43,9 +55,8 @@ if __name__ == "__main__":
             example_result = solution(example, True)
             print(example_result)
             print_content_separator()
-        if SKIP_EXERCISE:
-            continue
-        print("EXERCISE")
-        exercise = get_exercise_file(day)
-        result = solution(exercise, False)
-        print(result)
+        if RUN_EXERCISE:
+            print("EXERCISE")
+            exercise = get_exercise_file(day)
+            result = solution(exercise, False)
+            print(result)
