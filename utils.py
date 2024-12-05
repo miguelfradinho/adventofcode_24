@@ -2,6 +2,7 @@ import os
 import re
 import typing
 from os import path
+from datatypes import Coordinate, Direction
 
 FILES_FOLDER : str = "data"
 
@@ -50,3 +51,71 @@ def parse_ints(seq : str | list[str]) -> list[int]:
     elif isinstance(seq, list):
         return [int(i) for i in seq if i.isdecimal()]
     return []
+
+def get_cartesian_coordinates(coord: Coordinate, direction: Direction) -> Coordinate:
+    x, y = coord
+
+    match direction:
+        case Direction.Up:
+            return x, y + 1
+
+        case Direction.DiagonalRightUp:
+            return x + 1, y + 1
+
+        case Direction.Right:
+            return x + 1, y
+
+        case Direction.DiagonalRightDown:
+            return x + 1, y - 1
+
+        case Direction.Down:
+            return x, y - 1
+
+        case Direction.DiagonalLeftDown:
+            return x - 1, y - 1
+
+        case Direction.Left:
+            return x - 1, y
+
+        case Direction.DiagonalLeftUp:
+            return x - 1, y + 1
+
+        case other:
+            raise ValueError("Wrong parsing", other)
+
+def get_corner_coordinates(x:int, y:int, direction: Direction) -> Coordinate:
+    """
+    This assumes the top left corner as (0,0) and the coordinates as (y,x)
+    Returns
+    -------
+    (y,x)
+        Returns the (y,x) coordinates relative
+    """
+
+    match direction:
+        case Direction.Up:
+            return y-1, x
+
+        case Direction.DiagonalRightUp:
+            return y-1, x+1
+
+        case Direction.Right:
+            return y, x+1
+
+        case Direction.DiagonalRightDown:
+            return y+1, x+1
+
+        case Direction.Down:
+            return y + 1, x
+
+        case Direction.DiagonalLeftDown:
+            return y+1, x-1
+
+        case Direction.Left:
+            return y, x-1
+
+        case Direction.DiagonalLeftUp:
+            return y-1, x-1
+
+        case other:
+            raise ValueError("Wrong parsing", other)
