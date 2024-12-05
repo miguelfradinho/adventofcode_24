@@ -281,3 +281,5 @@ coverage*.info
 
 # ignoring the inputs
 data/**_input**
+# ignoring the cached inputs
+.aoc_input_cache/*
