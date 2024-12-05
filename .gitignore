@@ -277,3 +277,7 @@ coverage*.info
 *.[Cc]ache
 # but keep track of directories ending in .cache
 !?*.[Cc]ache/
+
+
+# ignoring the inputs
+data/**_input**
