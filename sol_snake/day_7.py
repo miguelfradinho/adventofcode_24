@@ -27,7 +27,8 @@ def can_be_solved(x: int, operators_combinations: OperatorCombinations, numbers:
             second = numbers_left.popleft()
             operator = ops_left.popleft()
 
-            # cachng the operation result would add enough overhead to make it 10-20 secs slower
+            # caching the operation result would add enough overhead to make it 10-20 secs slower without multi processing
+            # andl ess relevant with multiprocessing
             result = do_operation(operator, first, second)
             numbers_left.appendleft(result)
         if numbers_left[0] == x:
