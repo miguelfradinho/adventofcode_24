@@ -1,10 +1,11 @@
 from typing import TextIO
 import itertools
 from collections import deque
-import time
+import multiprocessing
 
 # test_value, operator_places, numbers
 type Equation = tuple[int, int, list[int]]
+type OperatorCombinations = list[tuple[str, ...]]
 
 def do_operation(op: str, first: int, second: int) -> int:
     match op:
@@ -17,7 +18,7 @@ def do_operation(op: str, first: int, second: int) -> int:
         case _:
             raise ValueError("Wrong operator!")
 
-def can_be_solved(x: int, operators_combinations: list[tuple[str, ...]], numbers: list[int]) -> bool:
+def can_be_solved(x: int, operators_combinations: OperatorCombinations, numbers: list[int]) -> bool:
     for ops in operators_combinations:
         numbers_left = deque(numbers)
         ops_left = deque(ops)
@@ -45,12 +46,20 @@ def parse_equations(content: TextIO) -> list[Equation]:
         result.append(equation)
     return result
 
+def equations_iterator(to_solve: list[Equation], operators, amount_to_take):
+    pos = 0  # store our current position
+    batch = to_solve[:]
+    while pos < len(batch):
+        yield [(x, list(itertools.product(operators, repeat=places)), numbers) for x, places, numbers in batch[pos:pos+amount_to_take]]
+        pos += amount_to_take
+
+def can_be_solved_multiple(chunk: list[tuple[int, OperatorCombinations, list[int]]]):
+    return [x for x, possible_solutions, numbers in chunk if can_be_solved(x, possible_solutions, numbers)]
+
 def day_7(content: TextIO, example: bool) -> tuple[int, int]:
 
     equations = parse_equations(content)
 
-    #start = time.time()
-    #print("Start", 0, start)
     operators_part_1 = ["*", "+"]
     results_part_1 = []
 
@@ -65,28 +74,18 @@ def day_7(content: TextIO, example: bool) -> tuple[int, int]:
             to_check_part_2.append((x, places, numbers))
 
     result_part_1 = sum(results_part_1)
-    #part_1_time = time.time()
-    #print("Part 1", part_1_time - start, part_1_time)
-    #print("Part 1: ", result_part_1)
 
     #print("PART 2")
     operators_part_2 = ["*", "+", "||"]
     result_part_2 = []
 
-    # caching the operations list actually makes it faster
-    possible_solutions_cache_2 : dict[int, list[tuple[str,...]]] = dict()
-    for x, places, numbers in to_check_part_2:
-        possible_solutions = possible_solutions_cache_2.get(places, None)
-        if possible_solutions is None:
-            # We need to cast the result of iter tools to a list to consume the generator (?)
-            # For whatever reason, if we try to cast it after, or use it as was, it'll just become None / empty list
-            possible_solutions = list(itertools.product(operators_part_2, repeat=places))
-            possible_solutions_cache_2[places] = possible_solutions
+    # ensure at least one process
+    cores = max(multiprocessing.cpu_count() - 1, 1)
+    pool = multiprocessing.Pool(processes=cores)
 
-        if can_be_solved(x, possible_solutions, numbers):
-            result_part_2.append(x)
-
-    #part_2_time = time.time()
-    #print("Part 2", part_2_time - start, part_2_time)
+    # doing in chunks of 50 is around 15 secs at 2.5 GHz on a 7940HS
+    # Doing in chunks of 1 is 12 secs, so meh
+    for result in pool.imap_unordered(func=can_be_solved_multiple, iterable=equations_iterator(to_check_part_2, operators_part_2, 50)):
+        result_part_2.extend(result)
 
     return (result_part_1, result_part_1 + sum(result_part_2))
