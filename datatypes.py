@@ -34,7 +34,6 @@ class Direction(Enum):
             case _:
                 return super().__repr__()
 
-
     @staticmethod
     def GetUpwardsDirections() -> set:
         return set([Direction.DiagonalRightUp, Direction.Up, Direction.DiagonalLeftUp])
@@ -50,3 +49,7 @@ class Direction(Enum):
     @staticmethod
     def GetRightwardsDirections() -> set:
         return set([Direction.DiagonalRightUp, Direction.Right, Direction.DiagonalRightDown])
+
+    @staticmethod
+    def GetCardinalDirections() -> set:
+        return set([Direction.Up, Direction.Right, Direction.Left, Direction.Down])

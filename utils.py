@@ -61,8 +61,8 @@ def get_corner_coordinates(x:int, y:int, direction: Direction) -> Coordinate:
     This assumes the top left corner as (0,0) and the coordinates as (y,x)
     Returns
     -------
-    (y,x)
-        Returns the (y,x) coordinates relative
+    (y,x) : tuple[int, int]
+        Returns the (y,x) coordinates relative to the top left  corner
     """
 
     match direction:
