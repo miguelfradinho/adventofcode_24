@@ -5,3 +5,4 @@ from .day_4 import day_4 as day_4
 from .day_5 import day_5 as day_5
 from .day_6 import day_6 as day_6
 from .day_7 import day_7 as day_7
+from .day_8 import day_8 as day_8
