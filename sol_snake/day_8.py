@@ -60,7 +60,32 @@ def day_8(content: TextIO, example: bool) -> tuple[int, int]:
     results_part_1 = len(antinodes_positions)
     #print_map(antennas_map, antinodes_positions)
 
+    antinodes_positions_2 = set()
+
+    for frequency, positions in antenna_positions.items():
+        for i, pos in enumerate(positions):
+            y, x = pos
+            for next_pos in positions[i+1:]:
+                y2, x2 = next_pos
+                # Vectorization time
+                difference = (y2-y, x2-x) # Find the vector between the 2 points
+                # Distance between the two points (length of the vector)
+                dist = utils.euclidean_distance(pos, next_pos)
+                # normalized vector
+                u_y, u_x = difference[0]/dist, difference[1]/dist
+
+                # we're probably overshooting a little bit (since we could limit based on how many distances we could fit the grid), but this is easier and helps us avoid rounding errors
+                for j in range(map_cols):
+                    anti_node_behind = (round(y-j*dist*u_y), round(x-j*dist*u_x))
+                    if is_within_bounds(anti_node_behind[1], anti_node_behind[0], map_rows, map_cols):
+                        antinodes_positions_2.add(anti_node_behind)
+
+                    anti_node_forward = (round(y2+j*dist*u_y), round(x2+j*dist*u_x))
+                    if is_within_bounds(anti_node_forward[1], anti_node_forward[0], map_rows, map_cols):
+                        antinodes_positions_2.add(anti_node_forward)
+
 
     #print("PART 2")
-    result_part_2 = 0
+    result_part_2 = len(antinodes_positions_2)
+    #print_map(antennas_map, antinodes_positions_2)
     return (results_part_1, result_part_2)
