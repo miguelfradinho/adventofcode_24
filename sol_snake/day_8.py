@@ -20,6 +20,35 @@ def print_map(antennas_map, antinodes_positions):
 def is_within_bounds(x:int, y:int, rows : int, cols:int) -> bool:
     return (0 <= y < rows) and (0 <= x < cols)
 
+
+def find_unit_vector_between(a, b) -> tuple[tuple[int,int], float]:
+    """Calculates the vector between 2 points (assumes (y,x))
+
+    Parameters
+    ----------
+    a : tuple[int,int]
+        (y1, x1)
+    b : tuple[int,int]
+        (y2, x2)
+
+    Returns
+    -------
+    tuple[tuple[int,int]]
+        Returns the unit vector + the distance between the 2 points
+    """
+    y1, x1 = a
+    y2, x2 = b
+    # Find the vector between the 2 points
+    diff = (y2-y1, x2-x1)
+    # Distance between the two points (length of the vector)
+    dist = utils.euclidean_distance(a, b)
+    # normalized vector
+    unit_vector = diff[0]/dist, diff[1]/dist
+
+    return (unit_vector, dist)
+
+
+
 def day_8(content: TextIO, example: bool) -> tuple[int, int]:
 
     antennas_map = [i.strip() for i in content.readlines()]
@@ -37,18 +66,12 @@ def day_8(content: TextIO, example: bool) -> tuple[int, int]:
                     positions.append((y,x))
 
     antinodes_positions = set()
-
     for frequency, positions in antenna_positions.items():
         for i, pos in enumerate(positions):
             y, x = pos
             for next_pos in positions[i+1:]:
                 y2, x2 = next_pos
-                # Vectorization time
-                difference = (y2-y, x2-x) # Find the vector between the 2 points
-                # Distance between the two points (length of the vector)
-                dist = utils.euclidean_distance(pos, next_pos)
-                # normalized vector
-                u_y, u_x = difference[0]/dist, difference[1]/dist
+                (u_y, u_x), dist = find_unit_vector_between(pos, next_pos)
 
                 anti_node_behind = (y-dist*u_y, x-dist*u_x)
                 if is_within_bounds(anti_node_behind[1], anti_node_behind[0], map_rows, map_cols):
@@ -61,18 +84,12 @@ def day_8(content: TextIO, example: bool) -> tuple[int, int]:
     #print_map(antennas_map, antinodes_positions)
 
     antinodes_positions_2 = set()
-
     for frequency, positions in antenna_positions.items():
         for i, pos in enumerate(positions):
             y, x = pos
             for next_pos in positions[i+1:]:
                 y2, x2 = next_pos
-                # Vectorization time
-                difference = (y2-y, x2-x) # Find the vector between the 2 points
-                # Distance between the two points (length of the vector)
-                dist = utils.euclidean_distance(pos, next_pos)
-                # normalized vector
-                u_y, u_x = difference[0]/dist, difference[1]/dist
+                (u_y, u_x), dist = find_unit_vector_between(pos, next_pos)
 
                 # we're probably overshooting a little bit (since we could limit based on how many distances we could fit the grid), but this is easier and helps us avoid rounding errors
                 for j in range(map_cols):
