@@ -6,7 +6,10 @@ from collections import deque
 type HikingPosition = tuple[Coordinate, int]
 
 # hoping there's no loops
-def yet_another_simple_pathfinding(y_x_grid, starting_position: HikingPosition, end_value : int) -> int:
+def yet_another_simple_pathfinding(
+        y_x_grid,
+        starting_position: HikingPosition,
+        end_value : int,*, only_unique: bool = True) -> int:
     rows, cols  = len(y_x_grid), len(y_x_grid[0])
 
     def is_within_bounds(pos) -> bool:
@@ -40,8 +43,15 @@ def yet_another_simple_pathfinding(y_x_grid, starting_position: HikingPosition, 
             next_pos = y_x_grid[next_y][next_x]
             # we can do this because the positions match their indexes, since it's easier
             (_), next_slope = next_pos
-            if (next_slope - slope == 1) and next_pos not in visited_nodes:
-                positions_to_check.appendleft(next_pos)
+            # check if it's  valid
+            if (next_slope - slope == 1):
+                # Unique visited nodes = part 1
+                part_1_criteria = (only_unique and next_pos not in visited_nodes)
+                # All (shortest, by definition) paths = part 2
+                part_2_criteria = (not only_unique)
+                if part_1_criteria or part_2_criteria:
+                    positions_to_check.appendleft(next_pos)
+
     return trail_heads
 
 def day_10(content: TextIO, example: bool) -> tuple[int, int]:
@@ -62,8 +72,7 @@ def day_10(content: TextIO, example: bool) -> tuple[int, int]:
 
     results_part_1 = [yet_another_simple_pathfinding(hiking_map, i, 9) for i in starting_positions]
 
-
-    results_part_2 = 0
+    results_part_2 = [yet_another_simple_pathfinding(hiking_map, i, 9, only_unique=False) for i in starting_positions]
 
     #print("PART 2")
-    return (sum(results_part_1), results_part_2)
+    return (sum(results_part_1), sum(results_part_2))
