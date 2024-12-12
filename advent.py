@@ -8,8 +8,8 @@ import argparse
 
 type Solution = Callable[[TextIO, bool], typing.Any]
 
-SKIP_DAYS : list[int] = [1,2,3,4,5,6, 7, 8]
-STOP_BEFORE = 10
+SKIP_DAYS : list[int] = [1,2,3,4,5,6, 7, 8, 9]
+STOP_BEFORE = 11
 AOC_YEAR = 2024
 
 def print_day_separator():
