@@ -23,7 +23,7 @@ def parse_ints(seq : str | list[str]) -> list[int]:
 
     """
     if isinstance(seq, str):
-        return [int(i) for i in seq.strip().split(" ") if re.match(r"[-+]?\d+", i)]
+        return [int(i) for i in re.findall(r"[-+]?\d+", seq)]
     # Assuming it's a list of strings
     elif isinstance(seq, list):
         return [int(i) for i in seq if i.isdecimal()]
